@@ -1,0 +1,143 @@
+﻿CREATE DATABASE EventManagement  
+
+CREATE TABLE Users (
+  Id int IDENTITY(1,1) PRIMARY KEY,
+  Name varchar(50),
+  Login varchar(15),
+  Role int NOT NULL
+)
+
+
+CREATE TABLE Rooms (
+  Id int PRIMARY KEY,
+  Name varchar(30),
+  Sigimi int
+)
+
+
+CREATE TABLE Orders (
+  Id int PRIMARY KEY,
+  RoomId int,
+  CompanyID int,
+  OrederTimeFrom datetime,
+  OrderTimeTo datetime
+)
+CREATE TABLE OrderPlace (
+  xonaId int,
+  userId int,
+  place int
+)
+
+ALTER TABLE OrderPlace ADD FOREIGN KEY ([userId]) REFERENCES Users (Id)
+ALTER TABLE OrderPlace ADD FOREIGN KEY (xonaId) REFERENCES Rooms (Id)
+ALTER TABLE Orders ADD FOREIGN KEY (CompanyID) REFERENCES Users (Id)
+ALTER TABLE Orders ADD FOREIGN KEY (RoomId) REFERENCES Rooms (Id)
+
+CREATE PROCEDURE AddRoom
+(
+	@roomsigimi INT,
+	@roomname VARCHAR(30)
+)
+AS
+BEGIN
+
+INSERT INTO Rooms(Sigimi,Name)
+VALUES (@roomsigimi , @roomname)
+
+END;
+
+
+
+CREATE PROCEDURE AddUsers
+(
+	 @name VARCHAR(50),
+	 @role INT,
+	 @login VARCHAR(15)
+)
+AS 
+BEGIN
+
+	INSERT INTO Users(Name,Role,Login)
+	VALUES (@name,@role,@login)
+
+END;
+
+CREATE PROCEDURE OrderRoom
+(
+	@roomID int,
+	@companyID int,
+	@OrederTimeFrom date,
+	@OrderTimeTo date
+)
+AS 
+BEGIN
+	 INSERT INTO Orders(RoomId,CompanyID,OrederTimeFrom,OrderTimeTo)
+	 VALUES(@roomID,@companyID,@OrederTimeFrom,@OrderTimeTo)
+END;
+
+
+CREATE PROCEDURE UpdateRoom
+(
+	@roomsigimi int 
+)
+AS 
+BEGIN
+	UPDATE Rooms
+	SET Sigimi=@roomsigimi
+END;
+--==================================
+CREATE PROCEDURE Events
+AS
+BEGIN
+	SELECT  T1.Id,T1.OrederTimeFrom 
+	FROM Orders AS T1, Users AS T2
+	WHERE T1.CompanyID = T2.Id 
+	ORDER BY T1.OrederTimeFrom
+END;
+--====================================
+CREATE PROCEDURE SelectRooms
+AS
+BEGIN
+	SELECT * FROM Rooms
+END;
+
+--=====================
+CREATE PROCEDURE ChekUsers
+(
+	@login varchar(15)
+)
+AS 
+BEGIN
+
+	SELECT * FROM Users
+	WHERE Login=@login
+
+END;
+--============================
+
+CREATE PROCEDURE InsertPleace
+(
+	@roomId int,
+	@userId int,
+	@please int
+)
+AS
+BEGIN
+	INSERT INTO OrderPlace(xonaId,userId,place)
+	VALUES(@roomId,@userId,@please)
+END;
+----------------------------------
+CREATE PROCEDURE SelectPlace
+(
+	@roomId int
+)
+AS 
+BEGIN
+	SELECT place FROM OrderPlace
+	WHERE xonaId=@roomId
+END;
+
+
+
+
+
